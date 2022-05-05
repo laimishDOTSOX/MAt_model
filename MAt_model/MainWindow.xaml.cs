@@ -190,11 +190,8 @@ namespace MAt_model
 
         private void Update_array(int a,int b)
         {
-            //получаем кол-во столбцов и строк в матрице чтобы удалить их
-            int count_col = Array.ColumnDefinitions.Count;
-            int count_row = Array.RowDefinitions.Count;
-            for (int i = 0; i < count_col; i++)Array.ColumnDefinitions.RemoveAt(0);
-            for (int i = 0; i < count_row; i++) Array.RowDefinitions.RemoveAt(0);
+            Array.RowDefinitions.Clear();
+            Array.ColumnDefinitions.Clear();
             //сохдаем и добавляем в сетку нужжное кол-во строк
             for (int i = 0; i <= b; i++)
             {
@@ -245,10 +242,8 @@ namespace MAt_model
 
         private void Update_vectors(int a, int b)//получает числа введенные в size_r и size_c
         {
-            int count_power = power_vector.ColumnDefinitions.Count; //получаем кол-во колонок 
-            int count_demand = demand_vector.ColumnDefinitions.Count;
-            for (int i = 0; i < count_power; i++)power_vector.ColumnDefinitions.RemoveAt(0);//удаляем по очереди все колонки
-            for (int i = 0; i < count_demand; i++) demand_vector.ColumnDefinitions.RemoveAt(0);
+            power_vector.ColumnDefinitions.Clear();
+            demand_vector.ColumnDefinitions.Clear();
 
             for (int i = 0; i < b; i++)//создаем кол-во колонок и текстовых блоков равное чилу введенному в size_r
             {
@@ -409,21 +404,21 @@ namespace MAt_model
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            int count_col = Array.ColumnDefinitions.Count - 1;
-            int count_row= Array.RowDefinitions.Count - 1;
-
-            for (int r = 1; r <= count_row; r++)
+            try
             {
-                for (int c = 1; c <= count_col; c++)
-                {
-                    try
-                    {
-                        if (FindName($"ArrayBox{r}_{c}") is TextBox value_vector) value_vector.Text = "";
-                    }
-                    catch {};
-                }
-            }
+                Update_array(Convert.ToInt32(size_c.Text), Convert.ToInt32(size_r.Text));
 
+                int count_p = power_vector.ColumnDefinitions.Count;
+                for (int i = 0; i < count_p; i++)
+                    if (FindName($"Power_{i}") is TextBox box)
+                        if (FindName($"ArrayBox{i + 1}_0") is TextBox value_vector) value_vector.Text = box.Text;
+
+                int count_d = demand_vector.ColumnDefinitions.Count;
+                for (int i = 0; i < count_d; i++)
+                    if (FindName($"Demand_{i}") is TextBox box)
+                        if (FindName($"ArrayBox0_{i + 1}") is TextBox value_vector) value_vector.Text = box.Text;
+            }
+            catch {};
             ATVET.Text = "F - суммарные затраты";
         }
     }
