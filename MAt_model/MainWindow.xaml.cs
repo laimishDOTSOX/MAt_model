@@ -40,6 +40,7 @@ namespace MAt_model
             int count_row = Array.RowDefinitions.Count;
             int count_col = Array.ColumnDefinitions.Count;
             int none_content_box = 0;//кол-во пустых ячеек
+            bool desis = true;
             for (int i = 0; i < count_row; i++)
             {
                 for (int c = 0; c < count_col; c++)
@@ -50,26 +51,28 @@ namespace MAt_model
                         {
                             box.Text = "";
                             none_content_box++;
+                            if (box.Text.Contains('|')) desis = false;
                         }
                     }
                 }
             }
-            if (none_content_box == 1) Decision();//если все возможные ячейки заполнены ( == 1, потомучно левая верхняя ячейка будет всегда пустая)
+            if (none_content_box == 1 & desis==true) Decision();//если все возможные ячейки заполнены ( == 1, потомучно левая верхняя ячейка будет всегда пустая)
            
         }
+
 
         private void Decision()
         {
             //кол-во строк и солбцов берем на 1 меньше, ибо унас есть "лишние" ячейки по которым не надо проходиться
             int count_col = Array.ColumnDefinitions.Count - 1;
             int count_row = Array.RowDefinitions.Count - 1;
+
             //создаем массивы векторов, чтобы отслеживать сколько осталось поставить продукции
             int[] col_demand = new int[count_col];
             int[] row_power= new int[count_row];
             int dem = 0;//будет хранить значение поставки (хз как объяснить крч)
             //кол-во строк, в которых закончилась продукция, и столбцов, в которым больше не нужна продукция
             int count_zero_dem = 0;
-            int count_zero_pow = 0;
             //заполняем массивы векторов 
             for (int i = 1; i <= count_col; i++)
             {
@@ -84,21 +87,17 @@ namespace MAt_model
             //проходимся по всем столбцам пока не распределим все поставки
             while (true)
             {
-                for (int i = 1; i <= count_col; i++)
-                {
-                    if (col_demand[i - 1] == 0) count_zero_dem++;
-                    else
-                    {
-                        int cell_row = Convert.ToInt32(Min_expense(i).Substring(8, 1));//находим строчку с минимальным числом в столбце (из полученного имени вырезаем символы
-                                                                                       //с 8 (по индексу) длинной в 1 символ
-                        dem = Counting(Min_expense(i), col_demand[i - 1], row_power[cell_row-1]);// получаем число поставленных товаров
-                        //вычитаем из массивов векторов это число
-                        col_demand[i - 1] = col_demand[i - 1] - dem;
-                        row_power[cell_row-1] = row_power[cell_row-1] - dem;
-                        if (row_power[cell_row - 1] == 0) count_zero_pow++;
-                    }
-                }
-                if (count_zero_dem >= count_col & count_zero_pow >= count_row) break;//если количество "закончившихся" ячеек больше или равно количеству столбцов и строк, то THE END
+                int cell_row = Convert.ToInt32(Min_expense(col_demand, row_power).Substring(8, 1));
+                int cell_col = Convert.ToInt32(Min_expense(col_demand, row_power).Substring(10, 1));
+
+                    dem = Counting(Min_expense(col_demand, row_power), col_demand[cell_col - 1], row_power[cell_row - 1]);// получаем число поставленных товаров
+                                                                                                     //вычитаем из массивов векторов это число
+                    col_demand[cell_col - 1] = col_demand[cell_col - 1] - dem;
+                    row_power[cell_row - 1] = row_power[cell_row - 1] - dem;
+                    if (col_demand[cell_col - 1] == 0) count_zero_dem++;
+                    if (count_zero_dem == count_col) break;
+                
+               
             }
             //пока считали в предыдущем (если оно пишется не через "ы" то я не знаю) блоке, отключали у блоков проверку на числа
             //ибо приписывали к значению "|", тк что теперь возвращаем им эту проверку 
@@ -126,8 +125,9 @@ namespace MAt_model
                     TextBox box = FindName($"ArrayBox{r}_{c}") as TextBox;
                     if (box.Text.Contains("|"))
                     {
-                        f += $"{box.Text.Substring(0, 1)}*{box.Text.Substring(4, 1)} + ";
-                        sum += Convert.ToInt32(box.Text.Substring(0, 1)) * Convert.ToInt32(box.Text.Substring(4, 1));
+                        var multipliers = box.Text.Split('|').Select(int.Parse).ToArray();
+                        f += $"{multipliers[0]}*{multipliers[1]} + ";
+                        sum += multipliers[0]* multipliers[1];
                     }
                 }
             }
@@ -138,13 +138,13 @@ namespace MAt_model
         private int Counting(string cell,int ost_dem, int ost_pow)
         {
             TextBox box = FindName(cell) as TextBox;
-            if (ost_pow > ost_dem)
+            if (ost_pow >= ost_dem)
             {
                 box.TextChanged -= ArrayBox_TextChanged;
                 box.Text = box.Text + " | " + ost_dem;
                 return ost_dem;
             }
-            else
+            else 
             {
                 box.TextChanged -= ArrayBox_TextChanged;
                 box.Text = box.Text + " | " + ost_pow;
@@ -152,29 +152,34 @@ namespace MAt_model
             }
         }
 
-        private string Min_expense(int col)
+        private string Min_expense(int[] col_demand, int[] row_power)
         {
             int count_row = Array.RowDefinitions.Count;
+            int count_col = Array.ColumnDefinitions.Count;
             List<expense> exp = new List<expense>();//создаем лист, числа в котором потом буудем сравнивать
             for (int r = 1; r < count_row; r++)
             {
-                TextBox box = FindName($"ArrayBox{r}_{col}") as TextBox;//находим блок по имени
-                if (box.Text.Contains("|")) ;//если он содержит "|" - ничего не делаем 
-                else exp.Add(new expense() { name = box.Name, exp = Convert.ToInt32(box.Text) }); //если знак есть - "заносим" число в этом блоке и имя блока в список
-
+                for (int c = 1; c < count_col; c++)
+                {
+                    TextBox box = FindName($"ArrayBox{r}_{c}") as TextBox;//находим блок по имени
+                    if (box.Text.Contains("|")) ;//если он содержит "|" - ничего не делаем 
+                    else exp.Add(new expense() { name = box.Name, exp = Convert.ToInt32(box.Text) }); //если знак есть - "заносим" число в этом блоке и имя блока в список
+                }
             }
-            int e = 0;//тут и будет самое маленькое число
-            //эти два условия никогда не будут работать ну и ладно 
-            if (exp.Count == 0) return exp[0].name;
-            if (exp.Count == 1) return exp[0].name;
-            //находим самое маленькое число
-            for (int i = 0; i < exp.Count-1; i++)
+            var sortEXP = exp.OrderBy(e => e.exp);
+            string name = "";
+            foreach (var item in sortEXP)
             {
-                if (exp[i].exp <= exp[i + 1].exp) e = i;
-                else if (exp[i + 1].exp <= exp[i].exp) e = i + 1;
+                int cell_row = Convert.ToInt32(item.name.Substring(8, 1));
+                int cell_col = Convert.ToInt32(item.name.Substring(10, 1));
+
+                if (col_demand[cell_col - 1] != 0 && row_power[cell_row - 1] != 0)
+                {
+                    name = item.name;
+                    break;
+                }   
             }
-            
-            return exp[e].name;//возвращаем имя ячейки с самым маленьким числом
+            return name;
         }
 
         class expense
@@ -316,18 +321,21 @@ namespace MAt_model
                 if (FindName($"Power_{i}") is TextBox box)
                 {
                     if (!Check_input(box.Text)) box.Text = "";
-                      else
+                    else
                     {
-                        if (Sum_vectors())
-                        {
-                            ATVET.Foreground = Brushes.White;
-                            ATVET.Text = "";
+                        try { 
+                            if (Sum_vectors())
+                            {
+                                ATVET.Foreground = Brushes.White;
+                                ATVET.Text = "";
+                            }
+                            else
+                            {
+                                ATVET.Foreground = Brushes.Red;
+                                ATVET.Text = "Суммы векторов не равны!!!";
+                            }
                         }
-                        else
-                        {
-                            ATVET.Foreground = Brushes.Red;
-                            ATVET.Text = "Суммы векторов не равны!!!";
-                        }
+                        catch {};
                     }
                     if (FindName($"ArrayBox{i + 1}_0") is TextBox value_vector)value_vector.Text = box.Text;
                 }
@@ -389,13 +397,34 @@ namespace MAt_model
             try
             {
                 int i = Convert.ToInt32(a);
-                return true;
+                if(i == 0) return false;
+                else return true;
             }
             catch (System.FormatException)
             {
                 return false;
             }
             
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            int count_col = Array.ColumnDefinitions.Count - 1;
+            int count_row= Array.RowDefinitions.Count - 1;
+
+            for (int r = 1; r <= count_row; r++)
+            {
+                for (int c = 1; c <= count_col; c++)
+                {
+                    try
+                    {
+                        if (FindName($"ArrayBox{r}_{c}") is TextBox value_vector) value_vector.Text = "";
+                    }
+                    catch {};
+                }
+            }
+
+            ATVET.Text = "F - суммарные затраты";
         }
     }
 }

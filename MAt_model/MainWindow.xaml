@@ -73,8 +73,8 @@
             </Border>
             <TextBlock Foreground="White" Grid.Row="2" Grid.Column="0" Text="Количество потребителей"  TextAlignment="Center" FontFamily="Montserrat Medium" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <TextBlock Foreground="White" Grid.Row="1" Grid.Column="0" Text="Количество поставщиков"  TextAlignment="Center" FontFamily="Montserrat Medium" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBlock Foreground="White" Grid.Row="3" Grid.Column="0" Text="Вектор мощи"  TextAlignment="Center" FontFamily="Montserrat Medium" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBlock Foreground="White" Grid.Row="4" Grid.Column="0" Text="Вектор спроса"  TextAlignment="Center" FontFamily="Montserrat Medium" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Foreground="White" Grid.Row="3" Grid.Column="0" Text="Мощи поставщиков"  TextAlignment="Center" FontFamily="Montserrat Medium" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Foreground="White" Grid.Row="4" Grid.Column="0" Text="Спрос потребителей"  TextAlignment="Center" FontFamily="Montserrat Medium" HorizontalAlignment="Center" VerticalAlignment="Center"/>
            <!--тут пишется количество столбцов--> <TextBox x:Name="size_c" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" BorderThickness="0,0,0,2" Background="Black" Foreground="White" Margin="10,30"  TextAlignment="Center" FontFamily="Montserrat Medium" TextChanged="Size_TextChanged" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Style="{DynamicResource TextBoxStyle1}" FontSize="16" />
            <!--тут пишется количество строк--> <TextBox x:Name="size_r" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" BorderThickness="0,0,0,2" Background="Black" Foreground="White" Margin="10,30"  TextAlignment="Center" FontFamily="Montserrat Medium" TextChanged="Size_TextChanged" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Style="{DynamicResource TextBoxStyle1}" FontSize="16" />
             <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" BorderBrush="White" BorderThickness="0,0,0,2" Margin="10,30">
@@ -95,7 +95,8 @@
                 <Grid.RowDefinitions>
                 </Grid.RowDefinitions>
             </Grid>
-            <TextBlock x:Name="ATVET" Background="Black" Foreground="White"  Grid.ColumnSpan="4" Grid.Row="5" Margin="30,15,30,0" FontSize="18" Text="sddddddddddddddddddd" FontFamily="Montserrat" TextAlignment="Center" TextDecorations="{x:Null}"/>
+            <TextBlock x:Name="ATVET" Background="Black" Foreground="White"  Grid.ColumnSpan="3" Grid.Column="1" Grid.Row="5" Margin="30,15,30,0" FontSize="18" Text="F - суммарные затраты" FontFamily="Montserrat" TextAlignment="Center" TextDecorations="{x:Null}"/>
+            <Button x:Name="Clear" Background="Black" Grid.Row="5" Foreground="White" Click="Clear_Click" Content="Очистить матрицу" BorderBrush="White" BorderThickness="2"  Margin="10,0,10,5"  />
         </Grid>
     </Grid>
 </Window>
