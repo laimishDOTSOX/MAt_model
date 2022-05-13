@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MAt_model"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Icon="https://i.pinimg.com/564x/05/a0/7a/05a07accd1556d452849b709cb6e320a.jpg">
+        Title=".SOX" Height="450" Width="800" Icon="https://i.pinimg.com/564x/05/a0/7a/05a07accd1556d452849b709cb6e320a.jpg">
     <Window.Resources>
         <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
         <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>

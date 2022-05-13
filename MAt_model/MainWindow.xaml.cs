@@ -24,7 +24,7 @@ namespace MAt_model
 
         private void Size_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!Check_input(size_c.Text)) size_c.Text = ""; //Если метод, проверяющий буква вводится или нет, возвращает false строка становится пустой 
+            if (!Check_input(size_c.Text)) size_c.Text = ""; //Если метод, проверяющий, буква вводится или нет, возвращает false, строка становится пустой 
             if (!Check_input(size_r.Text)) size_r.Text = "";
             if (size_c.Text != "" & size_r.Text != "")
             {
